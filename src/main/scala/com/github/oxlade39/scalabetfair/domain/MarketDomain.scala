@@ -108,3 +108,10 @@ case class MarketDetail(
  supportsStartingPrice: Boolean,
  turningInPlay: Boolean
 )
+
+case class MarketLiteDetail(
+ status: String,
+ eventDate: DateTime,
+ betDelay: Int,
+ numRunners: Int
+)

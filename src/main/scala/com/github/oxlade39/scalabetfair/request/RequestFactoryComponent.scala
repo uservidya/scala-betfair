@@ -16,6 +16,7 @@ trait RequestFactoryComponent {
     def allMarkets(request: AllMarketsRequest): GetAllMarketsReq
     def marketPrices(market: MarketName): GetCompleteMarketPricesCompressedReq
     def market(id: Int): GetMarketReq
+    def marketInfo(id: Int): GetMarketInfoReq
   }
 
 }
@@ -67,6 +68,13 @@ trait WsdlRequestFactoryComponent extends RequestFactoryComponent {
       request.setLocale("en")
       request.setHeader(headers.v5header)
       request
+    }
+
+    def marketInfo(id: Int): GetMarketInfoReq = {
+      val marketInfoReq = new GetMarketInfoReq()
+      marketInfoReq.setMarketId(id)
+      marketInfoReq.setHeader(headers.v5header)
+      marketInfoReq
     }
 
   }

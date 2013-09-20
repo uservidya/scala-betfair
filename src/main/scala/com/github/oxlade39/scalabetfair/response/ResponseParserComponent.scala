@@ -24,6 +24,7 @@ trait ResponseParserComponent {
 
   trait ResponseParser {
     def toEvents(response: GetEventTypesResp): Either[List[Event], RequestError]
+    def toMarketLiteDetail(response: GetMarketInfoResp): Either[MarketLiteDetail, RequestError]
     def toMarketDetails(response: GetAllMarketsResp): Either[List[MarketDetail], RequestError]
     def runnersFromMarket(response: GetMarketResp): Either[List[Runner], RequestError]
     def runnerPrice(response: InflatedCompletePrice): RunnerPrice
@@ -73,6 +74,22 @@ trait RealResponseParserComponent extends ResponseParserComponent {
         case _ => Right(RequestError("API error: %s:%s".format(response.getErrorCode, response.getMinorErrorCode)))
       }
     }
+
+    def toMarketLiteDetail(response: GetMarketInfoResp) =
+      response.getErrorCode match {
+        case GetMarketErrorEnum.OK => {
+          val jmarket: MarketLite = response.getMarketLite
+
+          Left(MarketLiteDetail(
+            jmarket.getMarketStatus.value(),
+            new DateTime(londonTimezone).withMillis(jmarket.getMarketTime.toGregorianCalendar.getTimeInMillis), //eventDate: DateTime
+            jmarket.getDelay, // betDelay: String
+            jmarket.getNumberOfRunners
+          ))
+        }
+        case _ => Right(RequestError("API error: %s:%s".format(response.getErrorCode, response.getMinorErrorCode)))
+
+      }
 
     def toMarketDetails(response: GetAllMarketsResp) =
       Option(response).flatMap(r => Option(r.getMarketData)).map(parseGetAllMarketsRespString(_)) match {

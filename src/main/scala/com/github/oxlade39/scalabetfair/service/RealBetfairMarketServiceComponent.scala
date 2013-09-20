@@ -75,6 +75,14 @@ trait RealBetfairMarketServiceComponent extends BetfairMarketService {
     responseParser.toEvents(response)
   }
 
+
+  def marketInfo(id: Int) = {
+    val bfRequest: GetMarketInfoReq = requestFactory.marketInfo(id)
+    val response: GetMarketInfoResp = exchangeService.getMarketInfo(bfRequest)
+
+    responseParser.toMarketLiteDetail(response)
+
+  }
   def allMarkets(userRequest: AllMarketsRequest): Either[List[MarketDetail], RequestError] = {
     val bfRequest: GetAllMarketsReq = requestFactory.allMarkets(userRequest)
     val response: GetAllMarketsResp = exchangeService.getAllMarkets(bfRequest)

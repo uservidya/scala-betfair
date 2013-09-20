@@ -11,8 +11,9 @@ import com.github.oxlade39.scalabetfair.request.Event
 import scala.Right
 import scala.Some
 import com.github.oxlade39.scalabetfair.domain
-import domain.{Runner, MarketName, RunnerDetail}
-import java.util.TimeZone
+import com.github.oxlade39.scalabetfair.domain.{MarketLiteDetail, Runner, MarketName, RunnerDetail}
+import java.util.{GregorianCalendar, TimeZone}
+import javax.xml.datatype.{DatatypeFactory, XMLGregorianCalendar}
 
 /**
  * @author dan
@@ -124,6 +125,30 @@ class ResponseParserSpec extends Specification {
       val bestBack = runnerDetail.bestBacks.head
       bestBack.backAvailable mustEqual BigDecimal("123.86")
       bestBack.price mustEqual BigDecimal("1.02")
+    }
+
+    "return MarketLiteDetail from GetMarketInfoResp" in {
+      val bfResponse = new GetMarketInfoResp()
+      val marketLite = new MarketLite()
+
+      val londonTimezone = DateTimeZone.forID("Europe/London")
+      val time = new DateTime(londonTimezone).withMillis(DateTime.now.getMillis)
+      val c: GregorianCalendar = new GregorianCalendar();
+      c.setTimeInMillis(time.getMillis)
+
+      marketLite.setDelay(6)
+      marketLite.setMarketStatus(MarketStatusEnum.INACTIVE)
+      marketLite.setMarketTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(c))
+      marketLite.setNumberOfRunners(7)
+      bfResponse.setMarketLite(marketLite)
+      bfResponse.setErrorCode(GetMarketErrorEnum.OK)
+
+      val response = underTest.toMarketLiteDetail(bfResponse)
+
+      response.isLeft mustEqual true
+      val lite = response.left.get
+
+      lite mustEqual MarketLiteDetail("INACTIVE", time, 6, 7)
     }
   }
 

@@ -80,5 +80,17 @@ class RequestFactorySpecification extends Specification with Mockito {
       market.getLocale mustEqual "en"
       market.getMarketId mustEqual 45789
     }
+
+    "create a marketInfo request" in {
+      val underTest = new UnderTest()
+      val v5Header = new V5Header()
+      underTest.headers.v5header returns v5Header
+
+      val marketInfo = underTest.requestFactory.marketInfo(5789)
+
+      marketInfo.getHeader must_== v5Header
+
+      marketInfo.getMarketId mustEqual 5789
+    }
   }
 }

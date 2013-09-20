@@ -15,8 +15,19 @@ import com.github.oxlade39.scalabetfair.request.Event
 import com.github.oxlade39.scalabetfair.request.DateRange
 import com.github.oxlade39.scalabetfair.domain.MarketDetail
 import com.github.oxlade39.scalabetfair.domain.MarketName
-import com.betfair.publicapi.types.exchange.v5.{GetMarketResp, GetMarketReq, GetCompleteMarketPricesCompressedResp, GetCompleteMarketPricesCompressedReq, GetAllMarketsReq, GetAllMarketsResp}
+import com.betfair.publicapi.types.exchange.v5._
 import com.github.oxlade39.scalabetfair.session.{Credentials, FSCredentialsComponent, CredentialsComponent, WsdlSessionProviderComponent}
+import scala.Left
+import com.github.oxlade39.scalabetfair.request.RequestError
+import com.github.oxlade39.scalabetfair.domain.MarketPrices
+import com.github.oxlade39.scalabetfair.request.AllMarketsRequest
+import com.github.oxlade39.scalabetfair.domain.Runner
+import com.github.oxlade39.scalabetfair.request.DateRange
+import com.github.oxlade39.scalabetfair.domain.MarketDetail
+import scala.Right
+import scala.Some
+import com.github.oxlade39.scalabetfair.domain.MarketName
+import com.github.oxlade39.scalabetfair.request.Event
 
 /**
  * @author dan
@@ -95,6 +106,24 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
 
       val response: Either[MarketPrices, RequestError] =
         underTest.marketPrices(request)
+
+      response mustEqual parsedResponse
+    }
+
+    "fetch market info detail from the betfair exchange service using the request factory and response parser" in {
+      val underTest = new UnderTest
+
+      val bfRequest = new GetMarketInfoReq
+      val bfResponse = new GetMarketInfoResp
+      // don't like returning mocks from mocks but the MarketDetail is a beast to construct...consider adding to TestExamples
+      val parsedResponse: Either[MarketLiteDetail, RequestError] = Left(MarketLiteDetail(MarketStatusEnum.ACTIVE.toString, DateTime.now, 4, 5))
+
+      underTest.requestFactory.marketInfo(12) returns bfRequest
+      underTest.exchangeService.getMarketInfo(bfRequest) returns bfResponse
+      underTest.responseParser.toMarketLiteDetail(bfResponse) returns parsedResponse
+
+      val response: Either[MarketLiteDetail, RequestError] =
+        underTest.marketInfo(12)
 
       response mustEqual parsedResponse
     }

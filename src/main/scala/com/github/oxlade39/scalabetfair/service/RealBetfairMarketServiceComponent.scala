@@ -75,7 +75,6 @@ trait RealBetfairMarketServiceComponent extends BetfairMarketService {
     responseParser.toEvents(response)
   }
 
-
   def marketInfo(id: Int) = {
     val bfRequest: GetMarketInfoReq = requestFactory.marketInfo(id)
     val response: GetMarketInfoResp = exchangeService.getMarketInfo(bfRequest)
@@ -90,29 +89,15 @@ trait RealBetfairMarketServiceComponent extends BetfairMarketService {
     responseParser.toMarketDetails(response)
   }
 
-  def marketPrices(market: MarketName): Either[MarketPrices, RequestError] = {
-    val bfRequest: GetMarketPricesCompressedReq = requestFactory.marketPrices(market)
+  def marketPrices(market: MarketName, currency: Option[String] = None): Either[MarketPrices, RequestError] = {
+    val bfRequest: GetMarketPricesCompressedReq = requestFactory.marketPrices(market, currency)
     val response: GetMarketPricesCompressedResp = exchangeService.getMarketPricesCompressed(bfRequest)
 
     responseParser.toMarketPrices(response, market)
   }
 
-  def completeMarketPricesWithRunnerNames(market: MarketName): Either[MarketPrices, RequestError] = {
-    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.completeMarketPrices(market)
-    val response: GetCompleteMarketPricesCompressedResp = exchangeService.getCompleteMarketPricesCompressed(bfRequest)
-
-    val bfMarketRequest: GetMarketReq = requestFactory.market(market.id)
-    val getMarketResponse = exchangeService.getMarket(bfMarketRequest)
-    val maybeRunners: Either[List[Runner], RequestError] = responseParser.runnersFromMarket(getMarketResponse)
-
-    maybeRunners match {
-      case Right(error) => Right(error)
-      case Left(runners) => responseParser.toMarketPrices(response, market, runners)
-    }
-  }
-
-  def completeMarketPrices(market: MarketName): Either[MarketPrices, RequestError] = {
-    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.completeMarketPrices(market)
+  def completeMarketPrices(market: MarketName, currency: Option[String] = None): Either[MarketPrices, RequestError] = {
+    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.completeMarketPrices(market, currency)
     val response: GetCompleteMarketPricesCompressedResp = exchangeService.getCompleteMarketPricesCompressed(bfRequest)
 
     responseParser.toMarketPrices(response, market)

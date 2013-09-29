@@ -60,11 +60,24 @@ class RequestFactorySpecification extends Specification with Mockito {
       val v5Header = new V5Header()
       underTest.headers.v5header returns v5Header
 
-      val prices = underTest.requestFactory.marketPrices(MarketName(345435, "Market Name"))
+      val prices = underTest.requestFactory.marketPrices(MarketName(345435, "Market Name"), Some("GBP"))
 
       prices.getHeader must_== v5Header
 
       prices.getCurrencyCode mustEqual "GBP"
+      prices.getMarketId mustEqual 345435
+    }
+
+    "create a marketPrices request from the given MarketName (without currency code)" in {
+      val underTest = new UnderTest()
+      val v5Header = new V5Header()
+      underTest.headers.v5header returns v5Header
+
+      val prices = underTest.requestFactory.marketPrices(MarketName(345435, "Market Name"))
+
+      prices.getHeader must_== v5Header
+
+      prices.getCurrencyCode mustEqual null
       prices.getMarketId mustEqual 345435
     }
 
@@ -77,7 +90,7 @@ class RequestFactorySpecification extends Specification with Mockito {
 
       prices.getHeader must_== v5Header
 
-      prices.getCurrencyCode mustEqual "GBP"
+      prices.getCurrencyCode mustEqual null
       prices.getMarketId mustEqual 345435
     }
 

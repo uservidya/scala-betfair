@@ -93,7 +93,7 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
       val parsedResponse: Either[MarketPrices, RequestError] =
         Left(MarketPrices(request, 10, List(RunnerDetail(Runner("", 3), 2.0, 4.0, List()))))
 
-      underTest.requestFactory.marketPrices(request) returns bfRequest
+      underTest.requestFactory.marketPrices(request, None) returns bfRequest
       underTest.exchangeService.getMarketPricesCompressed(bfRequest) returns bfResponse
       underTest.responseParser.toMarketPrices(bfResponse, request) returns parsedResponse
 
@@ -107,21 +107,13 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
       val underTest = new UnderTest
 
       val request = MarketName(34, "Market Name")
-      val marketRunners: List[Runner] = List(Runner("", 1), Runner("", 2))
       val bfRequest = new GetCompleteMarketPricesCompressedReq
       val bfResponse = new GetCompleteMarketPricesCompressedResp
-
-      val bfMarketRequest = new GetMarketReq
-      val bfMarketResponse = new GetMarketResp
 
       val parsedResponse: Either[MarketPrices, RequestError] =
         Left(MarketPrices(request, 10, List()))
 
-      underTest.requestFactory.market(request.id) returns bfMarketRequest
-      underTest.exchangeService.getMarket(bfMarketRequest) returns bfMarketResponse
-      underTest.responseParser.runnersFromMarket(bfMarketResponse) returns Left(marketRunners)
-
-      underTest.requestFactory.completeMarketPrices(request) returns bfRequest
+      underTest.requestFactory.completeMarketPrices(request, None) returns bfRequest
       underTest.exchangeService.getCompleteMarketPricesCompressed(bfRequest) returns bfResponse
       underTest.responseParser.toMarketPrices(bfResponse, request) returns parsedResponse
 
@@ -175,8 +167,6 @@ trait Example extends App {
       }
     }
 
-    println(pricesOrError)
-    println(pricesOrError)
     println(pricesOrError)
   }
 

@@ -95,6 +95,7 @@ trait RealResponseParserComponent extends ResponseParserComponent {
 
     def toMarketPrices(response: GetCompleteMarketPricesCompressedResp,
                        marketName: MarketName): Either[MarketPrices, RequestError] = {
+
       val prices: InflatedCompleteMarketPrices = new InflatedCompleteMarketPrices(response.getCompleteMarketPrices)
 
       assert(prices.getMarketId.equals (marketName.id),

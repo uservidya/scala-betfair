@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/oxlade39/scala-betfair.png)](http://travis-ci.org/oxlade39/scala-betfair)
+[![Build Status](https://secure.travis-ci.org/pic/scala-betfair.png)](http://travis-ci.org/pic/scala-betfair)
 
 Betfair API written in Scala
 ----------------------------

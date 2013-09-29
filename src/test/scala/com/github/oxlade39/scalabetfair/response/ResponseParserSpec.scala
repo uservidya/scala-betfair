@@ -103,14 +103,36 @@ class ResponseParserSpec extends Specification {
       events mustEqual List(Event(45453, Some("Some Event")), Event(45454, Some("Some Other Event")))
     }
 
+    "return MarketPrices from GetMarketPricesCompressedResp" in {
+
+      val bfResponse = new GetMarketPricesCompressedResp
+      bfResponse.setMarketPrices(TestExamples.exampleCompressedMarketPrices)
+
+      val response: Either[domain.MarketPrices, RequestError] = underTest.toMarketPrices(bfResponse,
+        MarketName(111179500, "Market Name"))
+
+      response.isLeft mustEqual true
+      val prices = response.left.get
+      prices.market mustEqual MarketName(111179500, "Market Name")
+      prices.inPlayDelay mustEqual 0
+      prices.runners.size mustEqual 6
+
+      val runnerDetail: RunnerDetail = prices.runners.head
+      runnerDetail.runner mustEqual Runner("", 6307039)
+      runnerDetail.totalAmountMatched mustEqual BigDecimal("4.0")
+      runnerDetail.lastPriceMatched mustEqual BigDecimal("3.25")
+      val bestBack = runnerDetail.bestBacks.head
+      bestBack.backAvailable mustEqual BigDecimal("5.0")
+      bestBack.price mustEqual BigDecimal("15.0")
+    }
+
     "return MarketPrices from GetCompleteMarketPricesCompressedResp" in {
 
       val bfResponse = new GetCompleteMarketPricesCompressedResp
       bfResponse.setCompleteMarketPrices(TestExamples.exampleCompressedCompleteMarketPrices)
 
       val response: Either[domain.MarketPrices, RequestError] = underTest.toMarketPrices(bfResponse,
-        MarketName(107119445, "Market Name"),
-        List(Runner("runner1", 30246), Runner("runner2", 30247)))
+        MarketName(107119445, "Market Name"))
 
       response.isLeft mustEqual true
       val prices = response.left.get
@@ -118,8 +140,8 @@ class ResponseParserSpec extends Specification {
       prices.inPlayDelay mustEqual 0
       prices.runners.size mustEqual 2
 
-      val runnerDetail: RunnerDetail = prices.runners.head
-      runnerDetail.runner mustEqual Runner("runner1", 30246)
+      val runnerDetail: RunnerDetail = prices.runners.sortBy {_.runner.selectionId}. head
+      runnerDetail.runner mustEqual Runner("", 30246)
       runnerDetail.totalAmountMatched mustEqual BigDecimal("0.0")
       runnerDetail.lastPriceMatched mustEqual BigDecimal(0)
       val bestBack = runnerDetail.bestBacks.head
@@ -171,6 +193,7 @@ class ResponseParserSpec extends Specification {
 
 object TestExamples {
   lazy val exampleMarketDataString = singleLineFromString("exampleMarketDataString.txt")
+  lazy val exampleCompressedMarketPrices = singleLineFromString("compressedMarketPrices.txt")
   lazy val exampleCompressedCompleteMarketPrices = singleLineFromString("compressedCompleteMarketPrices.txt")
 
   def singleLineFromString(fileName: String): String = {

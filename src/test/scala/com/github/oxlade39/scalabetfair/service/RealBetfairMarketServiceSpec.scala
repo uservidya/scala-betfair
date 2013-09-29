@@ -47,6 +47,7 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
   }
 
   "RealBetfairMarketService" should {
+
     "fetch active events from the global betfair service using the request factory and response parser" in {
       val underTest = new UnderTest
 
@@ -85,8 +86,28 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
     "fetch market prices from the betfair exchange service using the request factory and response parser" in {
       val underTest = new UnderTest
 
+      val request = MarketName(70, "Market Name")
+      val bfRequest = new GetMarketPricesCompressedReq
+      val bfResponse = new GetMarketPricesCompressedResp
+
+      val parsedResponse: Either[MarketPrices, RequestError] =
+        Left(MarketPrices(request, 10, List(RunnerDetail(Runner("", 3), 2.0, 4.0, List()))))
+
+      underTest.requestFactory.marketPrices(request) returns bfRequest
+      underTest.exchangeService.getMarketPricesCompressed(bfRequest) returns bfResponse
+      underTest.responseParser.toMarketPrices(bfResponse, request) returns parsedResponse
+
+      val response: Either[MarketPrices, RequestError] =
+        underTest.marketPrices(request)
+
+      response mustEqual parsedResponse
+    }
+
+    "fetch complete market prices from the betfair exchange service using the request factory and response parser" in {
+      val underTest = new UnderTest
+
       val request = MarketName(34, "Market Name")
-      val marketRunners: List[Runner] = List(Runner("Runner1", 1), Runner("Runner2", 2))
+      val marketRunners: List[Runner] = List(Runner("", 1), Runner("", 2))
       val bfRequest = new GetCompleteMarketPricesCompressedReq
       val bfResponse = new GetCompleteMarketPricesCompressedResp
 
@@ -100,12 +121,12 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
       underTest.exchangeService.getMarket(bfMarketRequest) returns bfMarketResponse
       underTest.responseParser.runnersFromMarket(bfMarketResponse) returns Left(marketRunners)
 
-      underTest.requestFactory.marketPrices(request) returns bfRequest
+      underTest.requestFactory.completeMarketPrices(request) returns bfRequest
       underTest.exchangeService.getCompleteMarketPricesCompressed(bfRequest) returns bfResponse
-      underTest.responseParser.toMarketPrices(bfResponse, request, marketRunners) returns parsedResponse
+      underTest.responseParser.toMarketPrices(bfResponse, request) returns parsedResponse
 
       val response: Either[MarketPrices, RequestError] =
-        underTest.marketPrices(request)
+        underTest.completeMarketPrices(request)
 
       response mustEqual parsedResponse
     }
@@ -127,6 +148,7 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
 
       response mustEqual parsedResponse
     }
+
   }
 }
 

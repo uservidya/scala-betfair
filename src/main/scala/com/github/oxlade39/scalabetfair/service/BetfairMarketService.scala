@@ -28,10 +28,12 @@ trait BetfairMarketService {
 
   def allMarkets(request: AllMarketsRequest): Either[List[MarketDetail], RequestError]
 
+  def marketPrices(market: MarketName): Either[MarketPrices, RequestError]
+
   /**
    * List all MarketPrices currently on the Betfair exchange for the given MarketName.
    * @param market the MarketName to search for.
    * @return all MarketPrices currently on the Betfair exchange for the given MarketName.
    */
-  def marketPrices(market: MarketName): Either[MarketPrices, RequestError]
+  def completeMarketPrices(market: MarketName): Either[MarketPrices, RequestError]
 }

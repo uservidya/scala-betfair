@@ -14,7 +14,8 @@ trait RequestFactoryComponent {
   trait RequestFactory {
     def activeEvents: GetEventTypesReq
     def allMarkets(request: AllMarketsRequest): GetAllMarketsReq
-    def marketPrices(market: MarketName): GetCompleteMarketPricesCompressedReq
+    def marketPrices(market: MarketName): GetMarketPricesCompressedReq
+    def completeMarketPrices(market: MarketName): GetCompleteMarketPricesCompressedReq
     def market(id: Int): GetMarketReq
     def marketInfo(id: Int): GetMarketInfoReq
   }
@@ -55,6 +56,14 @@ trait WsdlRequestFactoryComponent extends RequestFactoryComponent {
     }
 
     def marketPrices(market: MarketName) = {
+      val request: GetMarketPricesCompressedReq = new GetMarketPricesCompressedReq()
+      request.setCurrencyCode("GBP")
+      request.setMarketId(market.id)
+      request.setHeader(headers.v5header)
+      request
+    }
+
+    def completeMarketPrices(market: MarketName) = {
       val request: GetCompleteMarketPricesCompressedReq = new GetCompleteMarketPricesCompressedReq()
       request.setCurrencyCode("GBP")
       request.setMarketId(market.id)

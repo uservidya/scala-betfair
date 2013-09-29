@@ -91,7 +91,14 @@ trait RealBetfairMarketServiceComponent extends BetfairMarketService {
   }
 
   def marketPrices(market: MarketName): Either[MarketPrices, RequestError] = {
-    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.marketPrices(market)
+    val bfRequest: GetMarketPricesCompressedReq = requestFactory.marketPrices(market)
+    val response: GetMarketPricesCompressedResp = exchangeService.getMarketPricesCompressed(bfRequest)
+
+    responseParser.toMarketPrices(response, market)
+  }
+
+  def completeMarketPricesWithRunnerNames(market: MarketName): Either[MarketPrices, RequestError] = {
+    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.completeMarketPrices(market)
     val response: GetCompleteMarketPricesCompressedResp = exchangeService.getCompleteMarketPricesCompressed(bfRequest)
 
     val bfMarketRequest: GetMarketReq = requestFactory.market(market.id)
@@ -102,6 +109,13 @@ trait RealBetfairMarketServiceComponent extends BetfairMarketService {
       case Right(error) => Right(error)
       case Left(runners) => responseParser.toMarketPrices(response, market, runners)
     }
+  }
+
+  def completeMarketPrices(market: MarketName): Either[MarketPrices, RequestError] = {
+    val bfRequest: GetCompleteMarketPricesCompressedReq = requestFactory.completeMarketPrices(market)
+    val response: GetCompleteMarketPricesCompressedResp = exchangeService.getCompleteMarketPricesCompressed(bfRequest)
+
+    responseParser.toMarketPrices(response, market)
   }
 }
 

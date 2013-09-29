@@ -68,6 +68,19 @@ class RequestFactorySpecification extends Specification with Mockito {
       prices.getMarketId mustEqual 345435
     }
 
+    "create a completeMarketPrices request from the given MarketName" in {
+      val underTest = new UnderTest()
+      val v5Header = new V5Header()
+      underTest.headers.v5header returns v5Header
+
+      val prices = underTest.requestFactory.completeMarketPrices(MarketName(345435, "Market Name"))
+
+      prices.getHeader must_== v5Header
+
+      prices.getCurrencyCode mustEqual "GBP"
+      prices.getMarketId mustEqual 345435
+    }
+
     "create a market request" in {
       val underTest = new UnderTest()
       val v5Header = new V5Header()
@@ -92,5 +105,6 @@ class RequestFactorySpecification extends Specification with Mockito {
 
       marketInfo.getMarketId mustEqual 5789
     }
+
   }
 }

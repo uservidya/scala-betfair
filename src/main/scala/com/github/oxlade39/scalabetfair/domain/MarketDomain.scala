@@ -75,6 +75,7 @@ case class RunnerDetail(
 
 }
 
+
 /**
  * A List of RunnerDetail for an entire Market on the exchange.
  *
@@ -85,7 +86,8 @@ case class RunnerDetail(
 case class MarketPrices(
  market: MarketName,
  inPlayDelay: Int,
- runners: List[RunnerDetail]
+ runners: List[RunnerDetail],
+ compressedSource: Option[String]
 )
 
 /**

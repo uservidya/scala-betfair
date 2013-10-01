@@ -91,7 +91,7 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
       val bfResponse = new GetMarketPricesCompressedResp
 
       val parsedResponse: Either[MarketPrices, RequestError] =
-        Left(MarketPrices(request, 10, List(RunnerDetail(Runner("", 3), 2.0, 4.0, List()))))
+        Left(MarketPrices(request, 10, List(RunnerDetail(Runner("", 3), 2.0, 4.0, List())), None))
 
       underTest.requestFactory.marketPrices(request, None) returns bfRequest
       underTest.exchangeService.getMarketPricesCompressed(bfRequest) returns bfResponse
@@ -111,7 +111,7 @@ class RealBetfairMarketServiceSpec extends Specification with Mockito {
       val bfResponse = new GetCompleteMarketPricesCompressedResp
 
       val parsedResponse: Either[MarketPrices, RequestError] =
-        Left(MarketPrices(request, 10, List()))
+        Left(MarketPrices(request, 10, List(), None))
 
       underTest.requestFactory.completeMarketPrices(request, None) returns bfRequest
       underTest.exchangeService.getCompleteMarketPricesCompressed(bfRequest) returns bfResponse

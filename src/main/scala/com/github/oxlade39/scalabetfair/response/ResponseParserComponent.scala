@@ -31,9 +31,6 @@ trait ResponseParserComponent {
     def runnerPrice(response: InflatedCompletePrice): RunnerPrice
     def toMarketPrices(response: GetMarketPricesCompressedResp, marketName: MarketName): Either[MarketPrices, RequestError]
     def toMarketPrices(response: GetCompleteMarketPricesCompressedResp,
-                       marketName: MarketName,
-                       runners: List[Runner]): Either[MarketPrices, RequestError]
-    def toMarketPrices(response: GetCompleteMarketPricesCompressedResp,
                        marketName: MarketName): Either[MarketPrices, RequestError]
   }
 }
@@ -68,29 +65,7 @@ trait RealResponseParserComponent extends ResponseParserComponent {
           runnerPrices
         )
       }
-      Left(MarketPrices(marketName, prices.marketData.delay, runnerDetails))
-    }
-
-    def toMarketPrices(response: GetCompleteMarketPricesCompressedResp,
-                       marketName: MarketName,
-                       runners: List[Runner]): Either[MarketPrices, RequestError] = {
-      val prices: InflatedCompleteMarketPrices = new InflatedCompleteMarketPrices(response.getCompleteMarketPrices)
-
-      assert(prices.getMarketId.equals (marketName.id),
-        "The marketname must match the market in the compressed prices. %s != %s".format(prices.getMarketId, marketName.id))
-
-      val zipped: List[(Runner, InflatedCompleteRunner)] = runners.sortBy(_.selectionId).zip(prices.getRunners.sortBy(_.getSelectionId))
-      val runnerDetails: List[RunnerDetail] = zipped.map {
-        case (runner: Runner, bfRunner: InflatedCompleteRunner) =>
-          assert(runner.selectionId.equals (bfRunner.getSelectionId),
-            "selectionIds do not match, " + runner.selectionId + " != " + bfRunner.getSelectionId)
-
-          RunnerDetail(runner,
-            bfRunner.getLastPriceMatched,
-            bfRunner.getTotalAmountMatched,
-            bfRunner.getPrices.map(price => runnerPrice(price)).toList)
-      }
-      Left(MarketPrices(marketName, prices.getInPlayDelay, runnerDetails))
+      Left(MarketPrices(marketName, prices.marketData.delay, runnerDetails, Some(response.getMarketPrices)))
     }
 
     def toMarketPrices(response: GetCompleteMarketPricesCompressedResp,
@@ -108,7 +83,7 @@ trait RealResponseParserComponent extends ResponseParserComponent {
             bfRunner.getTotalAmountMatched,
             bfRunner.getPrices.map(price => runnerPrice(price)).toList)
       }.toList
-      Left(MarketPrices(marketName, prices.getInPlayDelay, runnerDetails))
+      Left(MarketPrices(marketName, prices.getInPlayDelay, runnerDetails, Some(response.getCompleteMarketPrices)))
     }
 
     def runnersFromMarket(response: GetMarketResp): Either[List[Runner], RequestError] = {

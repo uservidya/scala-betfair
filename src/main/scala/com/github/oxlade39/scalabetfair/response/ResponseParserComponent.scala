@@ -21,6 +21,7 @@ import com.github.oxlade39.scalabetfair.util.MarketPricesDataParser
  * @author dan
  */
 trait ResponseParserComponent {
+
   def responseParser: ResponseParser
 
   trait ResponseParser {
@@ -37,6 +38,8 @@ trait ResponseParserComponent {
 
 trait RealResponseParserComponent extends ResponseParserComponent {
   import scala.collection.JavaConversions._
+
+  import com.github.oxlade39.scalabetfair.util.ParseToolkit.escapedSplit
 
   val responseParser = new ResponseParser {
 
@@ -143,7 +146,7 @@ trait RealResponseParserComponent extends ResponseParserComponent {
   val londonTimezone = DateTimeZone.forID("Europe/London")
 
   private[this] def parseGetAllMarketsRespString(responseString: String): List[MarketDetail] = {
-    val marketsUnparsed: Array[String] = responseString.split(":")
+    val marketsUnparsed: List[String] = escapedSplit(responseString, ":")
     marketsUnparsed.toList.filter(!_.isEmpty) map {
       singleMarketUnparsed: String =>
         val marketFields: Array[String] = singleMarketUnparsed.split("~")

@@ -1,33 +1,16 @@
 package com.github.oxlade39.scalabetfair.util
 
+import org.specs2.mutable.Specification
+
 /**
  * Created with IntelliJ IDEA.
  * User: pic
  * Date: 9/27/13
  * Time: 12:18 AM
  */
-
-package com.github.oxlade39.scalabetfair.service
-
-import org.specs2.mutable.Specification
-
-/**
- * @author dan
- */
 class MarketPricesDataParserSpec extends Specification {
 
   import MarketPricesDataParser._
-
-  "escapedSplit" should {
-
-    "split a string in a list of pieces" in {
-      escapedSplit("ciao:miao", ":") mustEqual List("ciao", "miao")
-    }
-    "split a string in a list of pieces but join together the pieces separated by an escaped separator" in {
-      escapedSplit("ciao:micio \\: miao", ":") mustEqual List("ciao", "micio : miao")
-    }
-
-  }
 
   "inflatedMarketPrices" should {
 

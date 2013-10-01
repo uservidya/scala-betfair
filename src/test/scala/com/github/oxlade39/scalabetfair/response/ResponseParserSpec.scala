@@ -87,6 +87,41 @@ class ResponseParserSpec extends Specification {
       firstMarketDetails.turningInPlay mustEqual false
     }
 
+    "return marketDetails from GetAllMarketsResp bis (escape characters)" in {
+      val betfairResponse = new GetAllMarketsResp()
+
+      betfairResponse.setMarketData(TestExamples.exampleMarketDataStringBis)
+
+      val response = underTest.toMarketDetails(betfairResponse)
+
+      response.isLeft mustEqual true
+
+      val details = response.left.get
+      details.size mustEqual 178
+      val firstMarketDetails = details.head
+
+      firstMarketDetails.marketName mustEqual MarketName(111133750, "Man City Win from Behind")
+      firstMarketDetails.status mustEqual "ACTIVE"
+      firstMarketDetails.amountMatched mustEqual 0.0
+      firstMarketDetails.menuPath mustEqual List("Soccer", "UEFA Champions League", "Fixtures 02 October", "Man City v B Munich")
+      firstMarketDetails.betDelay mustEqual "0"
+      firstMarketDetails.country mustEqual("GBR")
+
+      val expectedEventDate = new DateTime(londonTimezone).withYear(2013).withMonthOfYear(10).withDayOfMonth(2)
+        .withHourOfDay(19).withMinuteOfHour(45)
+        .withSecondOfMinute(0).withMillisOfSecond(0)
+
+      firstMarketDetails.eventDate mustEqual expectedEventDate
+      firstMarketDetails.eventHierarchy mustEqual List("1", "78601", "27071149", "27071160", "111133750")
+      firstMarketDetails.exchangeId mustEqual 1
+      firstMarketDetails.lastRefresh mustEqual expectedEventDate.withDayOfMonth(1).withHourOfDay(22).withMinuteOfHour(49).withSecondOfMinute(32).withMillisOfSecond(153)
+      firstMarketDetails.marketType mustEqual "O"
+      firstMarketDetails.numPosWinners mustEqual 1
+      firstMarketDetails.numRunners mustEqual 2
+      firstMarketDetails.supportsStartingPrice mustEqual false
+      firstMarketDetails.turningInPlay mustEqual false
+    }
+
     "return a list of event from a GetEventTypesResp" in {
 
       val bfResponse = new GetEventTypesResp()
@@ -193,6 +228,7 @@ class ResponseParserSpec extends Specification {
 
 object TestExamples {
   lazy val exampleMarketDataString = singleLineFromString("exampleMarketDataString.txt")
+  lazy val exampleMarketDataStringBis = singleLineFromString("marketData.txt")
   lazy val exampleCompressedMarketPrices = singleLineFromString("compressedMarketPrices.txt")
   lazy val exampleCompressedCompleteMarketPrices = singleLineFromString("compressedCompleteMarketPrices.txt")
 
